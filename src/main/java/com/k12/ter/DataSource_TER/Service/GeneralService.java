@@ -1,14 +1,24 @@
 package com.k12.ter.DataSource_TER.Service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.google.gson.Gson;
+import com.k12.ter.DataSource_TER.repository.GeneralRepo;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -127,4 +137,21 @@ public class GeneralService {
             
     
     // }
+
+    @Autowired
+    private GeneralRepo generalRepo;
+
+    @Transactional("TerTransactionManager")
+    public ResponseEntity<Object> TestCOR(){
+        try{
+                        
+            List<Map<String,Object>> items = generalRepo.TestCOR();
+            return new ResponseEntity<Object>(renderJsonResponse("200", "Success","leaveApplications",items),
+            HttpStatus.OK);
+
+        }catch(Exception e){
+            log.error(e.getMessage());
+            return new ResponseEntity<Object>(renderJsonResponse("500", e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }    
 }

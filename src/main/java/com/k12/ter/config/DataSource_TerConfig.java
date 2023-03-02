@@ -21,7 +21,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @PropertySource({ "classpath:application.properties" })
 @EnableAutoConfiguration
 @EnableJpaRepositories(
-    basePackages = "com.k12.ter.DataSource_LCM", 
+    basePackages = "com.k12.ter.DataSource_TER", 
     entityManagerFactoryRef = "TerEntityManager", 
     transactionManagerRef = "TerTransactionManager"
 )
@@ -37,7 +37,7 @@ public class DataSource_TerConfig {
     public LocalContainerEntityManagerFactoryBean TerEntityManager() {
         final LocalContainerEntityManagerFactoryBean EntityManager = new LocalContainerEntityManagerFactoryBean();
         EntityManager.setDataSource(TerDataSource());
-        EntityManager.setPackagesToScan("com.k12.ter.DataSource_LCM.model");
+        EntityManager.setPackagesToScan("com.k12.ter.DataSource_TER.model");
 
         final HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         EntityManager.setJpaVendorAdapter(vendorAdapter);
