@@ -1,5 +1,6 @@
 package com.k12.ter.DataSource_TER.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -8,6 +9,7 @@ import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +20,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.google.gson.Gson;
-import com.k12.ter.DataSource_TER.repository.GeneralRepo;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class GeneralService {
+public class UtilityService {
 
     public String renderJsonResponse(String statusCode,String message){
         JSONObject resp = new JSONObject();
@@ -138,20 +139,34 @@ public class GeneralService {
     
     // }
 
-    @Autowired
-    private GeneralRepo generalRepo;
+    // @Autowired
+    // private RegistrationRepository generalRepo;
 
-    @Transactional("TerTransactionManager")
-    public ResponseEntity<Object> TestCOR(){
-        try{
+    // @Transactional("TerTransactionManager")
+    // public ResponseEntity<Object> TestCOR(){
+    //     try{
                         
-            List<Map<String,Object>> items = generalRepo.TestCOR();
-            return new ResponseEntity<Object>(renderJsonResponse("200", "Success","leaveApplications",items),
-            HttpStatus.OK);
+    //         List<Map<String,Object>> items = generalRepo.TestCOR();
+    //         ArrayList<Registration> regList = new ArrayList<>();
+    //         JSONArray list = toJSONArray(items);
+    //         for (int i = 0; i<list.length();i++) {
+    //             JSONObject o = list.getJSONObject(i);
+    //             Registration registration = new Gson().fromJson(o.toString(), Registration.class);
+    //             regList.add(registration);
+    //         }
+    //         for (Registration registration : regList) {
+    //             System.out.println(registration.getId());
+    //             System.out.println(registration.getFacultyid());
+    //         }
+    //         // for (Registration registration : items) {
+    //         //     registration.setId(null);
+    //         // }
+    //         return new ResponseEntity<Object>(renderJsonResponse("200", "Success","leaveApplications",items),
+    //         HttpStatus.OK);
 
-        }catch(Exception e){
-            log.error(e.getMessage());
-            return new ResponseEntity<Object>(renderJsonResponse("500", e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }    
+    //     }catch(Exception e){
+    //         log.error(e.getMessage());
+    //         return new ResponseEntity<Object>(renderJsonResponse("500", e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    // }
 }
