@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.k12.ter.DataSource_TER.Service.GeneralService;
-import com.k12.ter.DataSource_TER.repository.GeneralRepo;
+import com.k12.ter.DataSource_TER.Service.DbGeneralService;
+import com.k12.ter.DataSource_TER.Service.UtilityService;
 
 
 @CrossOrigin(origins = "*")
@@ -26,12 +26,11 @@ import com.k12.ter.DataSource_TER.repository.GeneralRepo;
 public class GeneralController {
 
     @Autowired 
-    private GeneralService generalService;
+    private DbGeneralService dbGeneralService;
 
-    @PostMapping(path = "search")
-    public ResponseEntity<Object> TestCOR(){
+    @PostMapping(path = "getCORByEmail")
+    public ResponseEntity<Object> TestCOR(@RequestBody Map<String,Object> params){
         //insert here for authentication from request header! value=authorization.
-        System.out.println("Testing");
-        return generalService.TestCOR();
+        return dbGeneralService.getCORByEmail(params);
     }
 }
