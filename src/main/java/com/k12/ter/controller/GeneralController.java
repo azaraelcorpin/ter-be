@@ -33,4 +33,10 @@ public class GeneralController {
         //insert here for authentication from request header! value=authorization.
         return dbGeneralService.getCORByEmail(params);
     }
+
+    @PostMapping(path = "checkAccount")
+    public ResponseEntity<Object> checkAccount(@RequestBody Map<String,Object> params){
+        //insert here for authentication from request header! value=authorization.
+        return dbGeneralService.checkAccount(params);
+    }
 }

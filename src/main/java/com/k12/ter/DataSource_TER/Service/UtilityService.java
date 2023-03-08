@@ -1,24 +1,15 @@
 package com.k12.ter.DataSource_TER.Service;
 
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
-import org.springframework.boot.configurationprocessor.json.JSONArray;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestBody;
-
 import com.google.gson.Gson;
 
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +23,18 @@ public class UtilityService {
         try {
             resp.put("statusCode", statusCode);
             resp.put("message", message);
+            return resp.toString();
+        } catch (JSONException e) {                       
+           return null;
+        }
+    }
+
+    public String renderJsonResponse(String statusCode,String message,String identifier, JSONObject object){
+        JSONObject resp = new JSONObject();
+        try {
+            resp.put("statusCode", statusCode);
+            resp.put("message", message);
+            resp.put(identifier, object);
             return resp.toString();
         } catch (JSONException e) {                       
            return null;
@@ -55,7 +58,24 @@ public class UtilityService {
 
             resp.put("statusCode", statusCode);
             resp.put("message", message);
-            resp.put(obj.getClass().getSimpleName(),new JSONObject(new Gson().toJson(obj)));
+            if(obj == null)
+                resp.put("Object","null value");
+            else
+                resp.put(obj.getClass().getSimpleName(),new JSONObject(new Gson().toJson(obj)));
+            log.info(resp.toString());
+            return resp.toString();
+
+    }
+
+    public String renderJsonResponse(String statusCode,String message,String Identifier,Object obj) throws JSONException{
+        JSONObject resp = new JSONObject();
+
+            resp.put("statusCode", statusCode);
+            resp.put("message", message);
+            if(obj == null)
+                resp.put("Object","null value");
+            else
+                resp.put(Identifier,new JSONObject(new Gson().toJson(obj)));
             log.info(resp.toString());
             return resp.toString();
 
@@ -128,16 +148,24 @@ public class UtilityService {
         
     // }
 
-    // public Date getDate(Object value){
-    //     if(value == null)
-    //         return null;
-    //     String dateString = value.toString();
-    //     if(dateString.isEmpty())
-    //         return null;
-    
-            
-    
-    // }
+    public Date getDate(Object value){
+        if(value == null)
+            return null;
+        String dateString = value.toString();
+        if(dateString.isEmpty())
+            return null;
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        Date date;
+        try {
+            date = dateFormat.parse(dateString);
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            log.error(dateString, e);
+            return null;
+        }
+        return date;
+    }
 
     // @Autowired
     // private RegistrationRepository generalRepo;
