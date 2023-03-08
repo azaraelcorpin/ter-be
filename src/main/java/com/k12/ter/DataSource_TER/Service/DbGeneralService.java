@@ -115,4 +115,29 @@ public class DbGeneralService {
         }
     }
     
+
+    public ResponseEntity<Object> getFacultyList() {
+        try{
+            K12_TerSched sched = k12_TerSchedRepository.findTopByOrderByIdDesc().orElse(null);
+            String sy = sched.getSy();
+        //get sy from ter_schedule table
+        String sql = " SELECT distinct (f.facultyid),f.fullname"
+         +"   FROM ter.k12_registration r, ter.k12_semsubject s, ter.k12_faculty f "
+         +"   WHERE r.sy = '"+sy+"'"
+         +"   AND r.subjcode =s.subjcode and r.section = s.section and r.sy =s.sy "
+         +"   AND s.facultyid = f.facultyid "
+         +"   order by f.facultyid ";       
+            List<Map<String,Object>> items = jdbcTemplate.queryForList(sql);
+        if(!items.isEmpty())
+            return new ResponseEntity<Object>(utilityService.renderJsonResponse("200", "Success","FacultyList",items),
+                HttpStatus.OK);
+
+        return new ResponseEntity<Object>(utilityService.renderJsonResponse("404", "Not Found"),
+        HttpStatus.NOT_FOUND);
+
+        }catch(Exception e){
+            log.error(e.getMessage());
+            return new ResponseEntity<Object>(utilityService.renderJsonResponse("500", e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
