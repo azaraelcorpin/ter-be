@@ -29,6 +29,18 @@ public class UtilityService {
         }
     }
 
+    public String renderJsonResponse(String statusCode,String message,String identifier, JSONObject object){
+        JSONObject resp = new JSONObject();
+        try {
+            resp.put("statusCode", statusCode);
+            resp.put("message", message);
+            resp.put(identifier, object);
+            return resp.toString();
+        } catch (JSONException e) {                       
+           return null;
+        }
+    }
+
 
     public String renderJsonResponse(String statusCode,String message,String ObjectName,String entityIdentifier) throws JSONException{
         JSONObject resp = new JSONObject();
@@ -50,6 +62,20 @@ public class UtilityService {
                 resp.put("Object","null value");
             else
                 resp.put(obj.getClass().getSimpleName(),new JSONObject(new Gson().toJson(obj)));
+            log.info(resp.toString());
+            return resp.toString();
+
+    }
+
+    public String renderJsonResponse(String statusCode,String message,String Identifier,Object obj) throws JSONException{
+        JSONObject resp = new JSONObject();
+
+            resp.put("statusCode", statusCode);
+            resp.put("message", message);
+            if(obj == null)
+                resp.put("Object","null value");
+            else
+                resp.put(Identifier,new JSONObject(new Gson().toJson(obj)));
             log.info(resp.toString());
             return resp.toString();
 
