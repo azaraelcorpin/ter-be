@@ -27,8 +27,8 @@ public class K12_TerSched {
     private String status = "closed";
 
     @Transient //@transient - annotates that this attribute must not reflect to the database
-    public static final String STATUS_CLOSED = "Closed";
+    public static final String STATUS_CLOSED = "closed";
 
     @Transient //@transient - annotates that this attribute must not reflect to the database
-    public static final String STATUS_OPEN = "Open";
+    public static final String STATUS_OPEN = "open";
 }
