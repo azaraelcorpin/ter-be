@@ -74,34 +74,56 @@ public class DbGeneralService {
     public ResponseEntity<Object> checkAccount(@RequestBody Map<String,Object> params) {
         try{
             String email = params.get("email").toString();
-            //check if AdminUser or Head
+            //check if AdminUser
             K12_User user = k12_UserRepository.findByEmail(email).orElse(null);
-            if(user != null){
-                JSONObject _user = new JSONObject();
-                _user.put("email", email);
-                _user.put("position", user.getPosition());
-                return new ResponseEntity<Object>(utilityService.renderJsonResponse("200", "Success","user",_user),
-                HttpStatus.OK);
+            JSONObject _user = new JSONObject();
+            if(user != null){                
+                _user.put("AdminUser", true);
             }
-            //check if faculty
-            String sql = "SELECT x.* FROM ter.k12_faculty x WHERE emailaddress = '"+email+"'";  
+            //get the email of heads
+            String sql ="SELECT x.*,COALESCE(kf.emailaddress,ef.email_address) as email FROM ter.k12_head x "
+                   + "left join pis.employee_frdb ef on ef.empid = x.facultyid "
+                   + "left join ter.k12_faculty kf on CONCAT(kf.facultyid) = x.facultyid "
+                   + "where x.department in ('CED','JUNIOR') and x.designation in ('Dean','Director') "
+                   + "and '"+email+"' in (kf.emailaddress,ef.email_address)";
             List<Map<String,Object>> rows = jdbcTemplate.queryForList(sql);
             if(!rows.isEmpty()){
-                JSONObject _user = new JSONObject();
-                _user.put("email", email);
-                _user.put("position", "faculty");
-                
+                    Map<String,Object> map = rows.get(0);                    
+                        _user.put("position", map.get("designation").toString().trim());
+                        _user.put("id", map.get("facultyid").toString().trim());
+                        _user.put("email", email);
+                        _user.put("eval_type","H");
+                        return new ResponseEntity<Object>(utilityService.renderJsonResponse("200", "Success","user",_user),
+                        HttpStatus.OK);                                                 
+            }
+            
+            //check if faculty
+            sql = "SELECT x.* FROM ter.k12_faculty x WHERE emailaddress = '"+email+"'";
+            rows = jdbcTemplate.queryForList(sql);
+            if(!rows.isEmpty()){
+                Map<String,Object> map = rows.get(0); 
+                    _user.put("email", email);
+                    _user.put("id",map.get("facultyid"));
+                    _user.put("position", "faculty");
+                    _user.put("eval_type","P");
                 return new ResponseEntity<Object>(utilityService.renderJsonResponse("200", "Success","user",_user),
                 HttpStatus.OK);
             }
+
+
             //check if enrolled student
-            K12_TerSched sched = k12_TerSchedRepository.findTopByOrderByIdDesc().orElse(null);
-            sql = "SELECT x.email  FROM ter.k12_registration x WHERE (sy = '"+sched.getSy()+"') AND (email = '"+email+"') limit 1";
+            K12_TerSched sched = k12_TerSchedRepository.findTopByStatusOrderByIdDesc("open").orElse(null);
+            if(sched == null)
+                new Exception("No record of open for TER evaluation");
+
+            sql = "SELECT CONCAT(s.id)as id  FROM ter.k12_registration x, ter.k12_student s "
+                + "WHERE s.email = x.email and (x.sy = '"+sched.getSy()+"') AND (x.email = '"+email+"') limit 1";
             rows = jdbcTemplate.queryForList(sql);
             if(!rows.isEmpty()){
-                JSONObject _user = new JSONObject();
                 _user.put("email", email);
                 _user.put("position", "student");
+                _user.put("eval_type","S");
+                _user.put("id",rows.get(0).get("id").toString());
                 
                 return new ResponseEntity<Object>(utilityService.renderJsonResponse("200", "Success","user",_user),
                 HttpStatus.OK);
@@ -118,15 +140,10 @@ public class DbGeneralService {
 
     public ResponseEntity<Object> getFacultyList() {
         try{
-            K12_TerSched sched = k12_TerSchedRepository.findTopByOrderByIdDesc().orElse(null);
-            String sy = sched.getSy();
+            // K12_TerSched sched = k12_TerSchedRepository.findTopByStatusOrderByIdDesc("open").orElse(null);
+            // String sy = sched.getSy();
         //get sy from ter_schedule table
-        String sql = " SELECT distinct (f.facultyid),f.fullname"
-         +"   FROM ter.k12_registration r, ter.k12_semsubject s, ter.k12_faculty f "
-         +"   WHERE r.sy = '"+sy+"'"
-         +"   AND r.subjcode =s.subjcode and r.section = s.section and r.sy =s.sy "
-         +"   AND s.facultyid = f.facultyid "
-         +"   order by f.facultyid ";       
+        String sql = "SELECT x.facultyid, trim(x.lastname)as lastname,trim(x.firstname)as firstname,x.emailaddress  FROM ter.k12_faculty x";       
             List<Map<String,Object>> items = jdbcTemplate.queryForList(sql);
         if(!items.isEmpty())
             return new ResponseEntity<Object>(utilityService.renderJsonResponse("200", "Success","FacultyList",items),
