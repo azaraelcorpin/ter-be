@@ -112,7 +112,7 @@ public class DbGeneralService {
 
 
             //check if enrolled student
-            K12_TerSched sched = k12_TerSchedRepository.findTopByStatusOrderByIdDesc("open").orElse(null);
+            K12_TerSched sched = k12_TerSchedRepository.findTopByStatusOrderByIdDesc(K12_TerSched.STATUS_OPEN).orElse(null);
             if(sched == null)
                 new Exception("No record of open for TER evaluation");
 
